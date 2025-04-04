@@ -619,13 +619,14 @@ class _VoiceBotScreenState extends State<VoiceBotScreen>
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            end: Alignment.bottomRight,
             colors: [
-              Colors.white,
-              Color.fromRGBO(255, 134, 225, 0.7),
+              // Colors.white,
+              Color.fromRGBO(255, 255, 255, 0.702),
+              Color.fromRGBO(255, 174, 235, 0.702),
               Color.fromRGBO(94, 159, 243, 1),
             ],
-            stops: [0.0, 0.5, 1.0],
+            stops: [0.3, 0.6, 1.8],
           ),
         ),
         child: SafeArea(
@@ -633,14 +634,6 @@ class _VoiceBotScreenState extends State<VoiceBotScreen>
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    color: Colors.grey,
-                    size: 24,
-                  ),
-                ),
               ),
               const SizedBox(height: 10),
               Text(
@@ -651,19 +644,18 @@ class _VoiceBotScreenState extends State<VoiceBotScreen>
                   foreground: Paint()
                     ..shader = const LinearGradient(
                       colors: <Color>[
-                        Color(0xFF8A65FF),
-                        Color(0xFF60A9F6),
+                        Color.fromRGBO(207, 202, 245, 1),
+                        Color.fromRGBO(121, 119, 252, 1),
+                        Color.fromRGBO(229, 168, 246, 1),
                       ],
-                    ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+                    ).createShader(Rect.fromLTWH(1.9, 1, 200.0, 170.0)),
                 ),
               ),
               const SizedBox(height: 6),
               Text(
-                'Ask Nexi anything',
+                'Ask Nexi Anything',
                 style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: Colors.black87,
-                ),
+                    fontSize: 20, color: const Color.fromRGBO(78, 78, 78, 1)),
               ),
               Expanded(
                 child: Center(
@@ -795,7 +787,7 @@ class BubblePainter extends CustomPainter {
     required this.isRecording,
     required this.flowPhase,
   }) : bubbles = List.generate(
-            0, // Add some bubbles (reduced from 12 for performance)
+            0,
             (index) => Bubble(
                   size: math.Random().nextDouble() * 0.4 + 0.2,
                   position: Offset(
@@ -808,7 +800,7 @@ class BubblePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 4);
+    final center = Offset(size.width / 2, size.height / 6);
     final radius = size.width / 3;
 
     // Draw background glow effect
@@ -943,24 +935,12 @@ class BubblePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final highlightPath = Path();
-    highlightPath.addOval(
-      Rect.fromCenter(
-        center: Offset(center.dx - radius * 0.4, center.dy - radius * 0.4),
-        width: radius * 0.8,
-        height: radius * 0.7,
-      ),
-    );
     canvas.drawPath(highlightPath, highlightPaint);
 
     // Add smaller secondary highlight
     final secondaryHighlightPaint = Paint()
       ..color = Color.fromRGBO(255, 255, 255, 0.3)
       ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-        Offset(center.dx + radius * 0.5, center.dy - radius * 0.6),
-        radius * 0.2,
-        secondaryHighlightPaint);
   }
 
   void _drawRim(Canvas canvas, Offset center, double radius) {
@@ -970,34 +950,8 @@ class BubblePainter extends CustomPainter {
       ..color = Color.fromRGBO(255, 255, 255, 0.3)
       ..strokeWidth = 1.5;
 
-    canvas.drawCircle(center, radius * 1.45, rimPaint);
+    canvas.drawCircle(center, radius * 1.47, rimPaint);
   }
-
-  // void _drawRecordingIndicator(
-  //     Canvas canvas, Offset center, double radius, Size size) {
-  //   // Pulsating record indicator
-  //   final pulseScale = 0.8 + 0.2 * math.sin(flowPhase * math.pi * 4);
-  //   final recordPaint = Paint()
-  //     ..color = Color.fromRGBO(5, 60, 60, 0.6 * pulseScale)
-  //     ..style = PaintingStyle.fill;
-
-  //   canvas.drawCircle(Offset(center.dx, center.dy + radius * 0.8),
-  //       radius * 0.15 * pulseScale, recordPaint);
-
-  //   // Draw ripple effects when recording
-  //   for (int i = 0; i < 3; i++) {
-  //     double ripplePhase = (flowPhase + i * 0.3) % 1.0;
-  //     if (ripplePhase < 0.6) {
-  //       final ripplePaint = Paint()
-  //         ..style = PaintingStyle.stroke
-  //         ..color = Color.fromRGBO(5, 70, 70, 0.4 * (1 - ripplePhase / 0.6))
-  //         ..strokeWidth = 2;
-
-  //       canvas.drawCircle(Offset(center.dx, center.dy + radius * 0.8),
-  //           radius * 0.15 + ripplePhase * radius * 0.5, ripplePaint);
-  //     }
-  //   }
-  // }
 
   @override
   bool shouldRepaint(BubblePainter oldDelegate) =>
@@ -1018,3 +972,206 @@ class Bubble {
     required this.speed,
   });
 }
+
+// class WavePainter extends CustomPainter {
+//   final bool isRecording;
+//   final double flowPhase;
+//   final int numWaves;
+
+//   WavePainter({
+//     required this.isRecording,
+//     required this.flowPhase,
+//     this.numWaves = 3,
+//   });
+
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     final center = Offset(size.width / 2, size.height / 4);
+//     final radius = size.width / 3;
+
+//     // Draw main bubble with gradient
+//     _drawMainBubble(canvas, size, center, radius);
+
+//     // Draw waves inside
+//     _drawWaves(canvas, size, center, radius);
+
+//     // Draw highlights and reflections
+//     _drawHighlights(canvas, center, radius);
+
+//     // Draw rim/edge with subtle border
+//     _drawRim(canvas, center, radius);
+//   }
+
+//   void _drawMainBubble(Canvas canvas, Size size, Offset center, double radius) {
+//     // Create a smooth gradient for the main bubble
+//     final Gradient gradient = RadialGradient(
+//       center: Alignment(0.3, -0.3),
+//       radius: 1.2,
+//       colors: [
+//         Color.fromRGBO(200, 170, 255, 0.7), // Light purple
+//         Color.fromRGBO(138, 101, 255, 0.7), // Mid purple
+//         Color.fromRGBO(96, 169, 246, 0.7), // Blue
+//         Color.fromRGBO(70, 130, 240, 0.6), // Darker blue
+//       ],
+//       stops: [0.0, 0.3, 0.6, 1.0],
+//     );
+
+//     // Calculate rotation and scale based on flowPhase
+//     final rotationAngle = flowPhase * math.pi / 6; // Subtle rotation
+//     final scaleVariation = 0.02 * math.sin(flowPhase * 3 * math.pi);
+
+//     // Draw with rotation
+//     canvas.save();
+//     canvas.translate(center.dx, center.dy);
+//     canvas.rotate(rotationAngle);
+//     canvas.scale(1.0 + scaleVariation, 1.0 - scaleVariation);
+//     canvas.translate(-center.dx, -center.dy);
+
+//     // Create and apply shader
+//     final Rect rect = Rect.fromCenter(
+//       center: center,
+//       width: size.width,
+//       height: size.height,
+//     );
+
+//     final Paint bubblePaint = Paint()
+//       ..style = PaintingStyle.fill
+//       ..shader = gradient.createShader(rect);
+
+//     canvas.drawCircle(center, radius * 1.45, bubblePaint);
+//     canvas.restore();
+//   }
+
+//   void _drawWaves(Canvas canvas, Size size, Offset center, double radius) {
+//     canvas.save();
+
+//     // Create clipping to keep waves inside the circle
+//     final clipPath = Path()
+//       ..addOval(Rect.fromCircle(center: center, radius: radius * 1.4));
+//     canvas.clipPath(clipPath);
+
+//     // Draw multiple waves with different phases and colors
+//     for (int i = 0; i < numWaves; i++) {
+//       final wavePhase = (flowPhase + i * 0.25) % 1.0;
+//       final opacity = 0.5 - (i * 0.1);
+//       final amplitude = radius * 0.15 * (1 - i * .2);
+
+//       final period = radius * 0.30;
+
+//       // Different colors for each wave
+//       final Color waveColor = i == 0
+//           ? Color.fromRGBO(255, 255, 255, opacity)
+//           : i == 1
+//               ? Color.fromRGBO(160, 220, 255, opacity)
+//               : Color.fromRGBO(180, 180, 255, opacity);
+
+//       _drawSingleWave(canvas, size, center, radius, wavePhase, amplitude,
+//           period, waveColor);
+
+//       _drawSecondWave(canvas, size, center, radius, wavePhase, amplitude,
+//           period, waveColor);
+//     }
+
+//     canvas.restore();
+//   }
+
+//   void _drawSingleWave(Canvas canvas, Size size, Offset center, double radius,
+//       double phase, double amplitude, double period, Color color) {
+//     final paint = Paint()
+//       ..color = color
+//       ..style = PaintingStyle.fill;
+
+//     final path = Path();
+
+//     // Start at the left side
+//     path.moveTo(center.dx - radius * 1.4, center.dy);
+
+//     // Generate the wave path
+//     for (double x = -radius * 1.4; x <= radius * 1.4; x += 1) {
+//       // Calculate wave y-position based on sine function
+//       final waveY =
+//           center.dy + amplitude * math.sin((x / period) + phase * math.pi * 8);
+
+//       // Add point to path
+//       path.lineTo(center.dx + x, waveY);
+//     }
+
+//     // Complete the path by drawing to bottom and back to start
+//     path.lineTo(center.dx + radius * 1.4, center.dy + radius * 1.4);
+//     path.lineTo(center.dx - radius * 1.4, center.dy + radius * 1.4);
+//     path.close();
+
+//     canvas.drawPath(path, paint);
+//   }
+
+//   void _drawSecondWave(Canvas canvas, Size size, Offset center, double radius,
+//       double phase, double amplitude, double period, Color color) {
+//     final paint = Paint()
+//       ..color = color
+//       ..style = PaintingStyle.fill;
+
+//     final path = Path();
+
+//     // Start at the left side
+//     path.moveTo(center.dx - radius * 1.8, center.dy);
+
+//     // Generate the wave path
+//     for (double x = -radius * 1.8; x <= radius * 1.8; x += 2) {
+//       // Calculate wave y-position based on sine function
+//       final waveY =
+//           center.dy + amplitude * math.sin((x / period) + phase * math.pi * 8);
+
+//       // Add point to path
+//       path.lineTo(center.dx + x, waveY);
+//     }
+
+//     // Complete the path by drawing to bottom and back to start
+//     path.lineTo(center.dx + radius * 2.4, center.dy + radius * 2.4);
+//     path.lineTo(center.dx - radius * 2.4, center.dy + radius * 2.4);
+//     path.close();
+
+//     canvas.drawPath(path, paint);
+//   }
+
+//   void _drawHighlights(Canvas canvas, Offset center, double radius) {
+//     // Draw upper-left highlight (simulates light reflection)
+//     final highlightPaint = Paint()
+//       ..color = Color.fromRGBO(255, 255, 255, 0.4)
+//       ..style = PaintingStyle.fill;
+
+//     final highlightPath = Path();
+//     highlightPath.addOval(
+//       Rect.fromCenter(
+//         center: Offset(center.dx - radius * 0.4, center.dy - radius * 0.4),
+//         width: radius * 0.8,
+//         height: radius * 0.7,
+//       ),
+//     );
+//     canvas.drawPath(highlightPath, highlightPaint);
+
+//     // Add smaller secondary highlight
+//     final secondaryHighlightPaint = Paint()
+//       ..color = Color.fromRGBO(255, 255, 255, 0.3)
+//       ..style = PaintingStyle.fill;
+
+//     canvas.drawCircle(
+//         Offset(center.dx + radius * 0.5, center.dy - radius * 0.6),
+//         radius * 0.2,
+//         secondaryHighlightPaint);
+//   }
+
+//   void _drawRim(Canvas canvas, Offset center, double radius) {
+//     // Draw subtle rim/edge
+//     final rimPaint = Paint()
+//       ..style = PaintingStyle.stroke
+//       ..color = Color.fromRGBO(255, 255, 255, 0.3)
+//       ..strokeWidth = 1.5;
+
+//     canvas.drawCircle(center, radius * 1.45, rimPaint);
+//   }
+
+//   @override
+//   bool shouldRepaint(WavePainter oldDelegate) =>
+//       oldDelegate.isRecording != isRecording ||
+//       oldDelegate.flowPhase != flowPhase;
+// }
