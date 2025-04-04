@@ -786,80 +786,56 @@ class BubblePainter extends CustomPainter {
   BubblePainter({
     required this.isRecording,
     required this.flowPhase,
-  }) : bubbles = List.generate(
-            0,
-            (index) => Bubble(
-                  size: math.Random().nextDouble() * 0.4 + 0.2,
-                  position: Offset(
-                    math.Random().nextDouble() * 1.5 - 0.25,
-                    math.Random().nextDouble() * 1.5 - 0.25,
-                  ),
-                  opacity: math.Random().nextDouble() * 0.3 + 0.1,
-                  speed: math.Random().nextDouble() * 0.02 + 0.01,
-                ));
+  }) : bubbles =
+            []; // Empty bubbles list since we don't want small circles inside
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 6);
     final radius = size.width / 3;
 
-    // Draw background glow effect
-    // if (isRecording) {
-    //   final glowPaint = Paint()
-    //     ..color = Color.fromRGBO(138, 101, 255, 0.2)
-    //     ..maskFilter = MaskFilter.blur(BlurStyle.normal, 30);
-
-    //   canvas.drawCircle(center, radius * 1.5, glowPaint);
-    // }
-
-    // Draw main bubble with more sophisticated gradient
+    // Draw main bubble with enhanced blue gradient
     _drawMainBubble(canvas, size, center, radius);
-
-    // Draw multiple small bubbles inside
-    _drawSmallBubbles(canvas, size, center, radius);
 
     // Draw highlights and reflections
     _drawHighlights(canvas, center, radius);
 
     // Draw rim/edge with subtle border
     _drawRim(canvas, center, radius);
-
-    // Add recording indicator if recording
-    // if (isRecording) {
-    // _drawRecordingIndicator(canvas, center, radius, size);
-    // }
   }
 
   void _drawMainBubble(Canvas canvas, Size size, Offset center, double radius) {
-    // Create a more sophisticated gradient for the main bubble
-    final Gradient gradient = RadialGradient(
-      center: Alignment(0.9, -0.1),
+    // Create a more sophisticated blue gradient for the main bubble
+    final Gradient gradient =  RadialGradient(
+      center: Alignment(0.5, -0.5),
       radius: 1.2,
       colors: [
-        Color.fromRGBO(180, 150, 255, 0.7), // Light purple
-        Color.fromRGBO(18, 101, 255, 0.7), // Mid purple
-        Color.fromRGBO(96, 169, 246, 0.7), // Blue
-        Color.fromRGBO(70, 130, 240, 0.6), // Darker blue
+        Color.fromRGBO(150, 190, 255, 0.8), // Light blue
+        Color.fromRGBO(96, 169, 246, 0.75), // Mid blue
+        Color.fromRGBO(18, 101, 255, 0.7), // Deep blue
+        Color.fromRGBO(70, 130, 240, 0.65), // Royal blue
       ],
-      stops: [0.0, 0.3, 0.6, 1.0],
+      stops: [0.0, 0.5, 0.7, 1.0],
     );
 
-    // Create a more interesting bubble shape
+    // Create a gentle flowing bubble shape
     final path = Path();
 
-    // Calculate rotation and scale based on flowPhase
-    final rotationAngle = flowPhase * 2 * math.pi;
-    final scaleVariation = 0.05 * math.sin(flowPhase * 4 * math.pi);
+    // Calculate rotation and scale based on flowPhase - slowed down by dividing flowPhase
+    final rotationAngle = flowPhase * math.pi / 1; // Slowed down rotation
+    final scaleVariation =
+        0.03 * math.sin(flowPhase * 1 * math.pi); // Reduced variation
 
-    // Create a slightly deformed circle using bezier curves
+    // Create a slightly deformed circle using bezier curves - with gentler deformation
     for (int i = 0; i < 8; i++) {
       double angle = i * math.pi / 4;
       double nextAngle = (i + 1) * math.pi / 4;
 
+      // Reduced deformation amount and slowed the frequency
       double radiusMod =
-          radius * (1.0 + 0.05 * math.sin(angle * 3 + flowPhase * math.pi * 2));
-      double nextRadiusMod = radius *
-          (1.0 + 0.05 * math.sin(nextAngle * 3 + flowPhase * math.pi * 2));
+          radius * (1.0 + 0.03 * math.sin(angle * 2 + flowPhase * math.pi));
+      double nextRadiusMod =
+          radius * (1.0 + 0.03 * math.sin(nextAngle * 2 + flowPhase * math.pi));
 
       Offset point = Offset(center.dx + math.cos(angle) * radiusMod * 1.45,
           center.dy + math.sin(angle) * radiusMod * 1.5);
@@ -869,8 +845,8 @@ class BubblePainter extends CustomPainter {
           center.dy + math.sin(nextAngle) * nextRadiusMod * 1.5);
 
       Offset controlPoint1 = Offset(
-          center.dx + math.cos(angle + math.pi / 8) * radiusMod * 1.6,
-          center.dy + math.sin(angle + math.pi / 8) * radiusMod * 1.7);
+          center.dx + math.cos(angle + math.pi / 8) * radiusMod * 1.55,
+          center.dy + math.sin(angle + math.pi / 8) * radiusMod * 1.6);
 
       if (i == 0) {
         path.moveTo(point.dx, point.dy);
@@ -882,7 +858,7 @@ class BubblePainter extends CustomPainter {
 
     path.close();
 
-    // Draw with rotation
+    // Draw with rotation - slowed down for more satisfying movement
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(rotationAngle);
@@ -904,51 +880,43 @@ class BubblePainter extends CustomPainter {
     canvas.restore();
   }
 
-  void _drawSmallBubbles(
-      Canvas canvas, Size size, Offset center, double radius) {
-    for (var bubble in bubbles) {
-      final position = Offset(
-          center.dx + (bubble.position.dx - 0.5) * radius * 2,
-          center.dy + (bubble.position.dy - 0.5) * radius * 2);
-
-      // Calculate animation for each bubble
-      final offset =
-          math.sin(flowPhase * math.pi * 2 + bubble.position.dx * 10) *
-              radius *
-              0.1;
-      final animatedPosition = Offset(position.dx + offset,
-          position.dy - bubble.speed * radius * flowPhase * 10 % (radius * 2));
-
-      final bubblePaint = Paint()
-        ..color = Color.fromRGBO(255, 255, 255, bubble.opacity)
-        ..style = PaintingStyle.fill;
-
-      canvas.drawCircle(
-          animatedPosition, radius * bubble.size * 0.3, bubblePaint);
-    }
-  }
-
   void _drawHighlights(Canvas canvas, Offset center, double radius) {
-    // Draw upper-left highlight (simulates light reflection)
+    // Enhanced highlight for more depth and dimension
     final highlightPaint = Paint()
-      ..color = Color.fromRGBO(255, 255, 255, 0.4)
+      ..color = const Color.fromRGBO(255, 255, 255, 0.3)
       ..style = PaintingStyle.fill;
 
+    // Create a gentle arc highlight in the upper left quadrant
     final highlightPath = Path();
-    canvas.drawPath(highlightPath, highlightPaint);
+    highlightPath.moveTo(center.dx - radius * 0.8, center.dy - radius * 0.4);
+    highlightPath.quadraticBezierTo(center.dx - radius * 0.3,
+        center.dy - radius * 0.9, center.dx, center.dy - radius * 0.7);
+    highlightPath.quadraticBezierTo(
+        center.dx - radius * 0.4,
+        center.dy - radius * 0.3,
+        center.dx - radius * 0.8,
+        center.dy - radius * 0.4);
 
-    // Add smaller secondary highlight
-    final secondaryHighlightPaint = Paint()
-      ..color = Color.fromRGBO(255, 255, 255, 0.3)
-      ..style = PaintingStyle.fill;
+    canvas.drawPath(highlightPath, highlightPaint);
   }
 
   void _drawRim(Canvas canvas, Offset center, double radius) {
-    // Draw subtle rim/edge
+    // Draw subtle rim/edge with gradient for more dimension
+    final rimGradient = const SweepGradient(
+      center: Alignment.topCenter,
+      colors: [
+        Color.fromRGBO(255, 255, 255, 0.5),
+        Color.fromRGBO(255, 255, 255, 0.2),
+        Color.fromRGBO(255, 255, 255, 0.5),
+      ],
+      stops: [0.0, 0.5, 1.0],
+    );
+
     final rimPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = Color.fromRGBO(255, 255, 255, 0.3)
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 1.2
+      ..shader = rimGradient
+          .createShader(Rect.fromCircle(center: center, radius: radius * 1.47));
 
     canvas.drawCircle(center, radius * 1.47, rimPaint);
   }
@@ -972,7 +940,6 @@ class Bubble {
     required this.speed,
   });
 }
-
 // class WavePainter extends CustomPainter {
 //   final bool isRecording;
 //   final double flowPhase;
